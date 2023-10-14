@@ -44,8 +44,8 @@ public class DealRequestController {
     @GetMapping(
             path = "/{id}" ,
             produces = {
-                    MediaType.APPLICATION_XML_VALUE,
-                    MediaType.APPLICATION_JSON_VALUE
+                    MediaType.APPLICATION_JSON_VALUE,
+                    MediaType.APPLICATION_XML_VALUE
             })
     public ResponseEntity<DealRequest> getDealRequestById(@PathVariable Long id) {
 
