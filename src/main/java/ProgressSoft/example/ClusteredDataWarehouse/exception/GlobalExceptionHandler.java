@@ -1,6 +1,9 @@
 package ProgressSoft.example.ClusteredDataWarehouse.exception;
 
 import ProgressSoft.example.ClusteredDataWarehouse.exception.CustomException.DealRequestNotFoundException;
+import ProgressSoft.example.ClusteredDataWarehouse.exception.CustomException.DuplicateEntryException;
+import ProgressSoft.example.ClusteredDataWarehouse.exception.CustomException.ValidationException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,34 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         //return a ResponseEntity
         return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleValidationException(ValidationException exception) {
+
+        //Create a Error Response
+        ErrorResponse response = new ErrorResponse();
+
+        response.setMessage("Validation Exception : "+exception.getMessage());
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+        response.setTimeStamp(System.currentTimeMillis());
+
+        //return a ResponseEntity
+        return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleDuplicateEntryException(DuplicateEntryException exception) {
+
+        //Create a Error Response
+        ErrorResponse response = new ErrorResponse();
+
+        response.setMessage("DuplicateEntryException : "+exception.getMessage());
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+        response.setTimeStamp(System.currentTimeMillis());
+
+        //return a ResponseEntity
+        return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler

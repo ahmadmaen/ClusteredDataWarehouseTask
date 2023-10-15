@@ -2,10 +2,13 @@ package ProgressSoft.example.ClusteredDataWarehouse.controller;
 
 import ProgressSoft.example.ClusteredDataWarehouse.entity.DealRequest;
 import ProgressSoft.example.ClusteredDataWarehouse.exception.CustomException.DealRequestNotFoundException;
+import ProgressSoft.example.ClusteredDataWarehouse.exception.CustomException.DuplicateEntryException;
 import ProgressSoft.example.ClusteredDataWarehouse.exception.CustomException.ValidationException;
 import ProgressSoft.example.ClusteredDataWarehouse.service.DealRequestService;
 import jakarta.validation.Valid;
+import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,7 +46,19 @@ public class DealRequestController {
             });
         }
         //once there are no errors , lets save the data on the object.
-        DealRequest savedDealRequest = dealRequestService.saveDealRequest(dealRequest);
+        DealRequest savedDealRequest;
+        try {
+            // the code that interacts with the database
+            savedDealRequest = dealRequestService.saveDealRequest(dealRequest);
+        } catch (DataAccessException  ex) {
+            String errorMessage = ex.getMessage();
+            if (errorMessage.contains("Duplicate entry")) {
+                   throw new DuplicateEntryException("A deal with the same unique ID already exists.");
+
+            } else {
+                throw new RuntimeException(ex);
+            }
+        }
 
         //return the object
         return new ResponseEntity<>(savedDealRequest, HttpStatus.CREATED);
